@@ -27,7 +27,7 @@ public class SignInController implements NavigableController {
     private UserBean userBean;
 
     @FXML private HBox headerBar;
-    @FXML private DefaultController headerBarController; // Assuming DefaultController handles the header
+    @FXML private DefaultController headerBarController;
 
     public SignInController() {
         // Default Constructor
@@ -87,8 +87,7 @@ public class SignInController implements NavigableController {
             if (outcome.startsWith(REDIRECT_PREFIX)) {
                 String screenToRedirect = outcome.substring(REDIRECT_PREFIX.length());
                 graphicControllerGui.setScreen(screenToRedirect);
-                // REMOVED: No need for an alert here, as the user is automatically logged in and redirected.
-                clearFields(); // Clear fields on successful signup
+                clearFields();
             } else if (outcome.startsWith(SIGNUP_FORM_PREFIX)) {
                 String appErrorMessage = outcome.substring(SIGNUP_FORM_PREFIX.length());
                 errorMessageLabel.setText(appErrorMessage);

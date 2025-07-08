@@ -45,7 +45,6 @@ public class DefaultController implements NavigableController {
         searchErrorLabel.textProperty().bind(movieSearchBean.searchErrorProperty());
         searchErrorLabel.getStyleClass().add("error-label");
 
-        // Bind the user button text to reflect login status and username from SessionManager
         StringBinding userButtonTextBinding = Bindings.createStringBinding(() -> {
             if (SessionManager.getInstance().isLoggedIn()) {
                 return SessionManager.getInstance().getCurrentUserBean().getUsername();
@@ -78,7 +77,6 @@ public class DefaultController implements NavigableController {
         SearchMovieController searchMovieController = new SearchMovieController();
         try {
             List<MovieBean> searchResults = searchMovieController.searchMovies(searchText);
-            // Pass both the results and the search query using the new helper class
             graphicControllerGui.setScreen(SEARCH_SCREEN_NAME, new SearchResultData(searchResults, searchText));
 
         } catch (ApiException e) {
@@ -107,10 +105,6 @@ public class DefaultController implements NavigableController {
         alert.showAndWait();
     }
 
-    /**
-     * Helper class to bundle search results (List<MovieBean>) and the original search query (String).
-     * This is used to pass both pieces of information to the SearchController.
-     */
     public static class SearchResultData {
         private final List<MovieBean> results;
         private final String query;

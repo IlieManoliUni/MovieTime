@@ -38,7 +38,6 @@ public class SearchController implements NavigableController, GraphicControllerG
     public void setGraphicController(GraphicControllerGui graphicController) {
         this.graphicControllerGui = graphicController;
 
-        // Pass the graphicController to the included header's controller.
         if (headerBarController != null) {
             headerBarController.setGraphicController(this.graphicControllerGui);
         } else {
@@ -112,7 +111,6 @@ public class SearchController implements NavigableController, GraphicControllerG
             } else {
                 text.setText(item);
                 setGraphic(hbox);
-                // Hide button if it's the "No results found" message
                 seeButton.setVisible(!item.startsWith("No results found"));
             }
         }
@@ -134,7 +132,6 @@ public class SearchController implements NavigableController, GraphicControllerG
             }
 
             try {
-                // Call the new specific navigation method in GraphicControllerGui
                 graphicControllerGui.navigateToShowMovieDetails(selectedMovieBean.getId());
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, e, () -> "An unexpected error occurred while showing details: " + e.getMessage());

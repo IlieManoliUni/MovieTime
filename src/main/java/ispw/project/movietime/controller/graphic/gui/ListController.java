@@ -5,8 +5,7 @@ import ispw.project.movietime.bean.MovieBean;
 import ispw.project.movietime.bean.UserBean;
 import ispw.project.movietime.controller.application.SeeAllElementsListController;
 import ispw.project.movietime.controller.application.DeleteMovieFromListController;
-import ispw.project.movietime.exception.DaoException; // For persistence errors
-// import ispw.project.movietime.exception.ApiException; // Uncomment if SeeAllElementsListController can throw this
+import ispw.project.movietime.exception.DaoException;
 import ispw.project.movietime.session.SessionManager;
 
 import javafx.collections.FXCollections;
@@ -24,7 +23,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// FIX: Add 'implements GraphicControllerGui.HasListBean'
 public class ListController implements NavigableController, GraphicControllerGui.HasListBean {
 
     private static final Logger LOGGER = Logger.getLogger(ListController.class.getName());
@@ -51,7 +49,7 @@ public class ListController implements NavigableController, GraphicControllerGui
     @FXML
     private HBox headerBar;
     @FXML
-    private DefaultController headerBarController; // Ensure this matches your FXML include for the header
+    private DefaultController headerBarController;
 
     public ListController() {
         this.seeAllElementsListController = new SeeAllElementsListController();
@@ -75,16 +73,13 @@ public class ListController implements NavigableController, GraphicControllerGui
         }
     }
 
-    @Override // This annotation is now correct because it implements GraphicControllerGui.HasListBean
+    @Override
     public void setListBean(ListBean listBean) {
-        // Unbind only if it's currently bound to the previous selectedListBean's property
-        // This prevents "java.lang.IllegalArgumentException: Property already bound" if setListBean is called multiple times
         if (this.selectedListBean != null && listNameLabel.textProperty().isBound() &&
                 listNameLabel.textProperty().getBean() == this.selectedListBean) {
             listNameLabel.textProperty().unbind();
         }
         this.selectedListBean = listBean;
-        // Bind the label to the listNameProperty from the ListBean
         listNameLabel.textProperty().bind(selectedListBean.listNameProperty());
         loadListItems();
         LOGGER.log(Level.INFO, "ListController: Set ListBean for list ''{0}''.", listBean.getListName());
@@ -109,24 +104,16 @@ public class ListController implements NavigableController, GraphicControllerGui
         try {
             List<MovieBean> movieBeans = seeAllElementsListController.seeAllMoviesInList(selectedListBean.getId(), currentUserBean);
 
-            // --- REMOVED LINE ---
-            // If movieBeans is null, it indicates an issue in the application layer or DAO.
-            // A more robust error handling or a message in the UI might be warranted here,
-            // but the original request was specifically to remove the "This list is empty." text.
             if (movieBeans == null) {
                 LOGGER.log(Level.SEVERE, "loadListItems: seeAllMoviesInList returned NULL for list ID: {0}", selectedListBean.getId());
                 showAlert(Alert.AlertType.ERROR, "Loading Error", "Movie list retrieval returned an unexpected null value.");
                 return; // Stop processing if the list itself is null
             }
-            // --- END REMOVED LINE ---
 
             LOGGER.log(Level.INFO, "loadListItems: Received {0} movie beans from controller.", movieBeans.size());
             if (movieBeans.isEmpty()) {
                 LOGGER.log(Level.INFO, "loadListItems: Movie list is empty. No movies to display.");
-                // Optionally, display a message to the user in the UI, e.g., "This list is empty."
-                // items.add("This list is empty."); // <--- THIS LINE IS REMOVED
             }
-            // --- END ADDED DIAGNOSTIC LOGGING ---
 
             for (MovieBean movieBean : movieBeans) {
                 String key = "Movie: " + movieBean.getTitle() + ID_STRING_SUFFIX + movieBean.getId() + ")";
@@ -137,10 +124,10 @@ public class ListController implements NavigableController, GraphicControllerGui
 
             LOGGER.log(Level.INFO, "loadListItems: Finished populating ListView. Total items in list view: {0}", items.size());
 
-        } catch (DaoException e) { // Catch specific DAO layer exceptions
+        } catch (DaoException e) {
             LOGGER.log(Level.SEVERE, "Error loading list items for list ''{0}'': {1}", new Object[]{selectedListBean.getListName(), e.getMessage()});
             showAlert(Alert.AlertType.ERROR, "Error Loading List Items", e.getMessage());
-        } catch (Exception e) { // Catch any other unexpected exceptions
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "An unexpected error occurred while loading list items for list ''{0}'': {1}", new Object[]{selectedListBean.getListName(), e.getMessage()});
             showAlert(Alert.AlertType.ERROR, SYSTEM_ERROR_TITLE, "An unexpected error occurred while loading list items: " + e.getMessage());
         }
@@ -154,26 +141,25 @@ public class ListController implements NavigableController, GraphicControllerGui
         private final Region spacer;
 
         public CustomListCell() {
-            hbox = new HBox(10); // Spacing between elements
+            hbox = new HBox(10);
             text = new Text();
             seeButton = new Button("See Details");
             deleteButton = new Button("Remove");
-            spacer = new Region(); // Spacer to push buttons to the right
+            spacer = new Region();
 
-            HBox.setHgrow(spacer, Priority.ALWAYS); // Make spacer take all available horizontal space
+            HBox.setHgrow(spacer, Priority.ALWAYS);
             hbox.getChildren().addAll(text, spacer, seeButton, deleteButton);
 
             setupButtonActions();
         }
-
         @Override
         protected void updateItem(String item, boolean empty) {
             super.updateItem(item, empty);
             if (empty || item == null) {
-                setGraphic(null); // No graphic for empty cells
+                setGraphic(null);
             } else {
                 text.setText(item);
-                setGraphic(hbox); // Set the HBox as the graphic for the cell
+                setGraphic(hbox);
             }
         }
 
@@ -205,7 +191,6 @@ public class ListController implements NavigableController, GraphicControllerGui
                 }
 
                 int id;
-                // Use pattern matching for instanceof (Java 16+)
                 if (itemBean instanceof MovieBean movieBean) {
                     id = movieBean.getId();
                 } else {
@@ -213,8 +198,6 @@ public class ListController implements NavigableController, GraphicControllerGui
                     showAlert(Alert.AlertType.ERROR, "Unsupported Item Type", "Cannot show details for this item type (only movies supported).");
                     return;
                 }
-
-                // Correctly delegates to GraphicControllerGui to navigate and fetch details
                 graphicControllerGui.navigateToShowMovieDetails(id);
                 LOGGER.log(Level.INFO, "Navigating to movie details for item ''{0}'', ID {1}.", new Object[]{itemString, id});
 
@@ -266,19 +249,16 @@ public class ListController implements NavigableController, GraphicControllerGui
                     showAlert(Alert.AlertType.WARNING, "Removal Info", "Item was not removed. It might not be in the list, or the operation failed.");
                 }
 
-            } catch (DaoException e) { // Catch specific DAO layer exceptions
+            } catch (DaoException e) {
                 LOGGER.log(Level.SEVERE, "Removal failed for item {0} from list ''{1}'': {2}", new Object[]{itemString, selectedListBean.getListName(), e.getMessage()});
                 showAlert(Alert.AlertType.ERROR, "Removal Failed", e.getMessage());
-            } catch (Exception e) { // Catch any other unexpected exceptions during the action
+            } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "An unexpected error occurred during removal of item {0} from list ''{1}'': {2}", new Object[]{itemString, selectedListBean.getListName(), e.getMessage()});
                 showAlert(Alert.AlertType.ERROR, SYSTEM_ERROR_TITLE, "An unexpected error occurred during removal: " + e.getMessage());
             }
         }
     }
 
-    /**
-     * Helper method to display an alert dialog.
-     */
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);

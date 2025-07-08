@@ -84,13 +84,6 @@ public class ShowController implements NavigableController, GraphicControllerGui
         }
     }
 
-    /**
-     * Sets the movie details for this controller, expecting a MovieBean type.
-     * This method is called by GraphicControllerGui after retrieving the MovieBean.
-     *
-     * @param id The ID of the movie.
-     * @param movieBean The MovieBean representation of the movie.
-     */
     public void setItemDetails(int id, MovieBean movieBean) {
         this.currentId = id;
         this.currentMovieBean = movieBean;

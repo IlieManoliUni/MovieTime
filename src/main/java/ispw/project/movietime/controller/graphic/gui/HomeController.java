@@ -3,10 +3,9 @@ package ispw.project.movietime.controller.graphic.gui;
 import ispw.project.movietime.bean.ListBean;
 import ispw.project.movietime.bean.UserBean;
 
-// Importing all necessary application controllers
 import ispw.project.movietime.controller.application.GetAllListsController;
 import ispw.project.movietime.controller.application.CreateListController;
-import ispw.project.movietime.controller.application.DeleteListController; // Import DeleteListController
+import ispw.project.movietime.controller.application.DeleteListController;
 
 import ispw.project.movietime.exception.DaoException;
 import javafx.beans.property.ObjectProperty;
@@ -44,7 +43,7 @@ public class HomeController implements NavigableController, GraphicControllerGui
     private final ObservableList<ListBean> items = FXCollections.observableArrayList();
 
     private GraphicControllerGui graphicControllerGui;
-    private ObjectProperty<UserBean> sessionUserProperty; // Holds the UserBean for the current session
+    private ObjectProperty<UserBean> sessionUserProperty;
 
     @FXML
     private HBox headerInclude;
@@ -52,34 +51,31 @@ public class HomeController implements NavigableController, GraphicControllerGui
     @FXML
     private DefaultController headerIncludeController;
 
-    // Application controllers - injected via constructor
     private GetAllListsController getAllListsController;
     private CreateListController createListController;
-    private DeleteListController deleteListController; // New: Inject DeleteListController
+    private DeleteListController deleteListController;
 
-    // Updated Constructor for dependency injection of all necessary application controllers
     public HomeController() {
         this.getAllListsController = new GetAllListsController();
         this.createListController = new CreateListController();
-        this.deleteListController = new DeleteListController(); // Initialize DeleteListController
+        this.deleteListController = new DeleteListController();
     }
 
     @FXML
     private void initialize() {
         listView.setItems(items);
-        listView.setCellFactory(param -> new CustomListCell()); // CustomListCell uses ListBean
+        listView.setCellFactory(param -> new CustomListCell());
 
         if (createButton != null) {
             createButton.setOnAction(event -> handleCreateButton());
         }
 
-        // Initialize the listener once
         sessionUserListener = (observable, oldValue, newValue) -> {
             LOGGER.log(Level.INFO, "HomeController Listener: sessionUserProperty changed: old={0}, new={1}", new Object[]{oldValue, newValue});
-            if (newValue != null) { // User is now logged in (newValue is not null)
+            if (newValue != null) {
                 LOGGER.log(Level.INFO, "HomeController Listener: User is now logged in, calling loadUserLists.");
                 loadUserLists(newValue); // Pass the current UserBean
-            } else { // User is logged out (newValue is null)
+            } else {
                 LOGGER.log(Level.INFO, "HomeController Listener: User is NOT logged in, clearing lists.");
                 items.clear();
             }
@@ -97,26 +93,21 @@ public class HomeController implements NavigableController, GraphicControllerGui
 
     @Override
     public void setSessionUserProperty(ObjectProperty<UserBean> userBeanProperty) {
-        // Remove old listener if it exists to prevent duplicates
         if (this.sessionUserProperty != null && sessionUserListener != null) {
             this.sessionUserProperty.removeListener(sessionUserListener);
         }
 
         this.sessionUserProperty = userBeanProperty;
-        // Add the listener to the new property
         if (sessionUserListener != null) {
             this.sessionUserProperty.addListener(sessionUserListener);
         } else {
             LOGGER.log(Level.SEVERE, "Session user listener was null during setSessionUserProperty.");
         }
 
-        // Also pass the user property to the header if it needs it
-        // This assumes DefaultController also implements GraphicControllerGui.NeedsSessionUser
         if (headerIncludeController != null && headerIncludeController instanceof GraphicControllerGui.NeedsSessionUser headerNeedsSession) {
             headerNeedsSession.setSessionUserProperty(userBeanProperty);
         }
 
-        // Initial load based on current login state
         if (userBeanProperty.get() != null) {
             LOGGER.log(Level.INFO, "HomeController.setSessionUserProperty(): Initial check: User IS logged in. Calling loadUserLists.");
             loadUserLists(userBeanProperty.get());
@@ -135,7 +126,6 @@ public class HomeController implements NavigableController, GraphicControllerGui
         }
 
         try {
-            // DELEGATE: Call the application layer controller
             List<ListBean> lists = getAllListsController.getAllListsForUser(currentUser);
 
             items.setAll(lists);
@@ -165,10 +155,9 @@ public class HomeController implements NavigableController, GraphicControllerGui
         }
 
         try {
-            // DELEGATE: Call the application layer controller
             ListBean newlyCreatedList = createListController.createNewList(newItemName, currentUser);
             textField.clear();
-            items.add(newlyCreatedList); // Add the newly created list directly to the observable list
+            items.add(newlyCreatedList);
             showAlert(Alert.AlertType.INFORMATION, "Success", "List '" + newlyCreatedList.getListName() + "' created.");
         } catch (DaoException e) {
             showAlert(Alert.AlertType.ERROR, "List Creation Failed", e.getMessage());
@@ -178,8 +167,6 @@ public class HomeController implements NavigableController, GraphicControllerGui
         }
     }
 
-
-    // CustomListCell now works with ListBean
     private class CustomListCell extends ListCell<ListBean> {
         private final HBox hbox;
         private final Text text;
@@ -208,14 +195,12 @@ public class HomeController implements NavigableController, GraphicControllerGui
             if (empty || item == null) {
                 setGraphic(null);
             } else {
-                // CORRECTED: Use listNameProperty() as defined in ListBean
                 text.textProperty().bind(item.listNameProperty());
                 setGraphic(hbox);
             }
         }
 
         private void setupButtonActions() {
-            // Pass the ListBean directly to navigation/deletion methods
             seeButton.setOnAction(event -> navigateToScreen(getItem(), "list"));
             statsButton.setOnAction(event -> navigateToScreen(getItem(), "stats"));
             deleteButton.setOnAction(event -> handleDeleteAction(getItem())); // Changed to pass ListBean directly
@@ -232,7 +217,6 @@ public class HomeController implements NavigableController, GraphicControllerGui
             }
 
             try {
-                // Pass the ListBean directly to the graphic controller for navigation
                 graphicControllerGui.navigateToListDetail(selectedListBean, screen);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "An unexpected error occurred during navigation: {0}", e.getMessage());
@@ -250,7 +234,6 @@ public class HomeController implements NavigableController, GraphicControllerGui
                 return;
             }
 
-            // Optional: Confirmation dialog before deletion
             Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
             confirmationAlert.setTitle("Confirm Deletion");
             confirmationAlert.setHeaderText("Delete List: " + listToDeleteBean.getListName() + "?");
@@ -258,10 +241,9 @@ public class HomeController implements NavigableController, GraphicControllerGui
             confirmationAlert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
                     try {
-                        // DELEGATE: Call the application layer's DeleteListController
-                        deleteListController.deleteList(listToDeleteBean, currentUser); // Direct call to injected controller
+                        deleteListController.deleteList(listToDeleteBean, currentUser);
 
-                        items.remove(listToDeleteBean); // Remove the bean from the observable list
+                        items.remove(listToDeleteBean);
                         showAlert(Alert.AlertType.INFORMATION, "Success", "List '" + listToDeleteBean.getListName() + "' deleted.");
                     } catch (DaoException e) {
                         showAlert(Alert.AlertType.ERROR, "Deletion Failed", e.getMessage());
