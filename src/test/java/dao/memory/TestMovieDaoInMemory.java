@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestMovieDaoInMemory {
+class TestMovieDaoInMemory {
 
     private MovieDaoInMemory movieDaoInMemory;
     private Map<Integer, MovieModel> movieMap; // To access the private 'movieMap' via reflection
@@ -147,7 +147,8 @@ public class TestMovieDaoInMemory {
 
         // Assert
         // Attempt to add a new movie using the new constructor
-        assertThrows(UnsupportedOperationException.class, () -> allMovies.add(new MovieModel(4, 100, "New Movie")),
+        MovieModel newMovie = new MovieModel(4, 100, "New Movie");
+        assertThrows(UnsupportedOperationException.class, () -> allMovies.add(newMovie),
                 "The returned list should be unmodifiable.");
     }
 }

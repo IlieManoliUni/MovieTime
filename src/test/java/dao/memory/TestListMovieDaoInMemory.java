@@ -10,12 +10,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Collections; // Import Collections for emptyList
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("ListMovieDaoInMemory Tests")
-public class TestListMovieDaoInMemory {
+class TestListMovieDaoInMemory {
 
     private ListMovieDaoInMemory listMovieDao;
 
@@ -253,11 +252,12 @@ public class TestListMovieDaoInMemory {
             List<MovieModel> movies = listMovieDao.getAllMoviesInList(list1);
 
             // Attempt to modify the returned list
-            assertThrows(UnsupportedOperationException.class, () -> movies.add(createMovie(999, "New Movie")),
+            MovieModel newMovie = createMovie(999, "New Movie");
+            assertThrows(UnsupportedOperationException.class, () -> movies.add(newMovie),
                     "Adding to the returned list should throw UnsupportedOperationException");
             assertThrows(UnsupportedOperationException.class, () -> movies.remove(0),
                     "Removing from the returned list should throw UnsupportedOperationException");
-            assertThrows(UnsupportedOperationException.class, () -> movies.clear(),
+            assertThrows(UnsupportedOperationException.class, movies::clear, // Refactored here
                     "Clearing the returned list should throw UnsupportedOperationException");
 
             // Verify the original list in the DAO is unaffected by modification attempts

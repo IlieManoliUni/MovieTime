@@ -5,13 +5,18 @@ import ispw.project.movietime.exception.DaoException;
 import ispw.project.movietime.model.UserModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
+
 
 import java.lang.reflect.Field;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestUserDaoInMemory {
+class TestUserDaoInMemory {
 
     private UserDaoInMemory userDaoInMemory;
     private Map<String, UserModel> usersMap; // To access the private 'users' map via reflection
@@ -54,27 +59,14 @@ public class TestUserDaoInMemory {
         assertNull(retrievedUser, "Should return null for a non-existent user.");
     }
 
-    @Test
-    void testRetrieveByUsernameNullThrowsIllegalArgumentException() {
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    @ValueSource(strings = {"   ", "\t", "\n"})
+    void testRetrieveByUsernameInvalidThrowsIllegalArgumentException(String username) {
         // Assert
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-                () -> userDaoInMemory.retrieveByUsername(null));
-        assertEquals("Username cannot be null or empty.", thrown.getMessage());
-    }
-
-    @Test
-    void testRetrieveByUsernameEmptyThrowsIllegalArgumentException() {
-        // Assert
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-                () -> userDaoInMemory.retrieveByUsername(""));
-        assertEquals("Username cannot be null or empty.", thrown.getMessage());
-    }
-
-    @Test
-    void testRetrieveByUsernameBlankThrowsIllegalArgumentException() {
-        // Assert
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-                () -> userDaoInMemory.retrieveByUsername("   "));
+                () -> userDaoInMemory.retrieveByUsername(username));
         assertEquals("Username cannot be null or empty.", thrown.getMessage());
     }
 
@@ -94,7 +86,7 @@ public class TestUserDaoInMemory {
     }
 
     @Test
-    void testSaveUserExistingUsernameThrowsDaoException() throws DaoException {
+    void testSaveUserExistingUsernameThrowsDaoException() {
         // Arrange
         UserModel existingUser = new UserModel("existingUser", "oldPass");
         usersMap.put(existingUser.getUsername(), existingUser);
@@ -117,32 +109,13 @@ public class TestUserDaoInMemory {
         assertEquals("User model cannot be null.", thrown.getMessage());
     }
 
-    @Test
-    void testSaveUserNullUsernameThrowsIllegalArgumentException() {
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    @ValueSource(strings = {"   ", "\t", "\n"}) // Add any other blank strings you want to test
+    void testSaveUserInvalidUsernameThrowsIllegalArgumentException(String username) {
         // Arrange
-        UserModel user = new UserModel(null, "password");
-
-        // Assert
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-                () -> userDaoInMemory.saveUser(user));
-        assertEquals("User's username cannot be null or empty.", thrown.getMessage());
-    }
-
-    @Test
-    void testSaveUserEmptyUsernameThrowsIllegalArgumentException() {
-        // Arrange
-        UserModel user = new UserModel("", "password");
-
-        // Assert
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-                () -> userDaoInMemory.saveUser(user));
-        assertEquals("User's username cannot be null or empty.", thrown.getMessage());
-    }
-
-    @Test
-    void testSaveUserBlankUsernameThrowsIllegalArgumentException() {
-        // Arrange
-        UserModel user = new UserModel("   ", "password");
+        UserModel user = new UserModel(username, "password");
 
         // Assert
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
