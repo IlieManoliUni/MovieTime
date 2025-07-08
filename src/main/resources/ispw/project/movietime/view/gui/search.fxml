@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.text.Text?>
+<?import ispw.project.movietime.controller.graphic.gui.SearchController?>
+
+<VBox xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ispw.project.movietime.controller.graphic.gui.SearchController">
+
+    <fx:include fx:id="headerBar" source="default.fxml" />
+
+    <VBox alignment="TOP_CENTER" spacing="10" style="-fx-padding: 20;" VBox.vgrow="ALWAYS">
+        <Label fx:id="searchResultsLabel" text="Search Results" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;" />
+
+        <ListView fx:id="listView" VBox.vgrow="ALWAYS" style="-fx-border-color: #ccc; -fx-border-radius: 5px;" />
+    </VBox>
+
+</VBox>

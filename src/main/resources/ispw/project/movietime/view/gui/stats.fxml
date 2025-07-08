@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import ispw.project.movietime.controller.graphic.gui.StatsController?>
+
+<VBox xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ispw.project.movietime.controller.graphic.gui.StatsController">
+
+    <fx:include fx:id="headerBar" source="default.fxml" />
+
+    <VBox alignment="TOP_CENTER" spacing="10" style="-fx-padding: 20;" VBox.vgrow="ALWAYS">
+        <Label fx:id="listNameLabel" text="Stats of List" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;" />
+
+        <TextArea fx:id="statsTextArea"
+                  editable="false" promptText="Statistics will be displayed here..."
+                  style="-fx-pref-height: 300; -fx-pref-width: 600; -fx-font-size: 14px;"
+                  VBox.vgrow="ALWAYS" />
+    </VBox>
+</VBox>
