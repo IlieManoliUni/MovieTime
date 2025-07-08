@@ -96,7 +96,6 @@ public class UserBean {
     public String toString() {
         return "UserBean{" +
                 "username='" + username.get() + '\'' +
-                ", password='[HIDDEN]'" + // Always hide password in toString for security
                 '}';
     }
 }

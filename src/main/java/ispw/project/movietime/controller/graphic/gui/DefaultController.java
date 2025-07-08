@@ -83,7 +83,6 @@ public class DefaultController implements NavigableController {
             showAlert(Alert.AlertType.ERROR, "Search Error", "Failed to search movies: " + e.getMessage());
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "System Error", "An unexpected error occurred during search: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 

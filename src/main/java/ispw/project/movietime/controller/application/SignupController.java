@@ -42,8 +42,7 @@ public class SignupController {
 
         } catch (DaoException _) {
             return "signup_form_view:An error occurred during signup. Please try again later.";
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception _) {
             return "signup_form_view:An unexpected system error occurred. Please try again.";
         }
     }
